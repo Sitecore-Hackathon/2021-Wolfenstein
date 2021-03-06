@@ -1,0 +1,242 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Hackathon</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js">
+	</script>
+    <style>
+      .autocomplete {
+        position: absolute;
+        display: none;
+      }
+
+      .autocomplete-title {
+        display: block;
+        padding: 5px 10px;
+        font-size: 16px;
+        font-weight: 900;
+        border: solid 1px #000;
+        background-color: #e3e3e3;
+      }
+
+      .autocomplete.active {
+        display: block;
+        background-color: #fff;
+        border: solid 1px #000;
+      }
+
+      .autocomplete-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .autocomplete .item {
+        padding: 3px 5px;
+      }
+
+      .autocomplete .item.active {
+        background-color: #4d93f8;
+        font-weight: 900;
+      }
+
+      .loader {
+        width: 15px;
+        height: 15px;
+        display: none;
+        padding: 0px;
+        position: absolute;
+        border-radius: 100%;
+        border: 2px solid;
+        border-top-color: #4d93f8;
+        border-bottom-color: rgba(255, 255, 255, 0.3);
+        border-left-color: #4d93f8;
+        border-right-color: rgba(255, 255, 255, 0.3);
+        -webkit-animation: loader4 1s ease-in-out infinite;
+        animation: loader4 1s ease-in-out infinite;
+      }
+
+      @keyframes loader4 {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @-webkit-keyframes loader4 {
+        from {
+          -webkit-transform: rotate(0deg);
+        }
+        to {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+
+      .loader.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+	<p>Please, press shift + white space to autocomplete text</p>
+    <h1 class="txt" contenteditable="true">This</h1>
+    <p class="txt" contenteditable="true">Test paragraph</p>
+    <div class="autocomplete">
+      <span class="autocomplete-title">Predictive Search</span>
+      <ul class="autocomplete-list"></ul>
+    </div>
+
+    <div class="loader"></div>
+
+    <script type="text/javascript">
+      //<![CDATA[
+      document.querySelectorAll(".txt").forEach((element) => {
+        element.addEventListener("keyup", handleKeyPress);
+      });
+
+      var elementTriggered = null;
+      var loader = document.querySelector(".loader");
+
+      function handleKeyPress(event) {
+        if (event.keyCode == 32 && event.shiftKey) {
+          var range = document.createRange(),
+            x = null,
+            y = null;
+          const isSupported = typeof window.getSelection !== "undefined";
+          if (isSupported) {
+            const selection = window.getSelection();
+            if (selection.rangeCount !== 0) {
+              var range = selection.getRangeAt(0);
+              var rect = range.getClientRects()[0];
+              if (rect) {
+                x = rect.left;
+                y = rect.top + 5;
+                loader.setAttribute("style", `top:${y}px; left:${x}px`);
+                loader.classList.add("active");
+              }
+            }
+          }
+          getPredictiveSearch(event.currentTarget);
+        }
+      }
+
+      function getPredictiveSearch(element) {
+        var data = {};
+        data.text = element.innerText.trim();
+        data.length = 1;
+        data.sequences = 5;
+        const url = "http://8ee8a6d2bcc6.ngrok.io/api/generate-text";
+        elementTriggered = element;
+
+        axios
+          .post(url, data, {
+            responseType: "json",
+          })
+          .then(function (res) {
+            if (res.data.generatedTexts.length) {
+              loader.classList.remove("active");
+              renderResponse(res.data.generatedTexts);
+            }
+          })
+          .catch(function (error) {
+              loader.classList.remove("active");
+            console.log(error);
+          });
+      }
+
+      function renderResponse(data) {
+        var range = document.createRange(),
+          x = null,
+          y = null;
+
+        const autocomplete = document.querySelector(".autocomplete");
+        const autocompleteList = document.querySelector(".autocomplete-list");
+        const isSupported = typeof window.getSelection !== "undefined";
+        var options = "";
+
+        data.forEach((element, index) => {
+          options += `<li class="${
+            index === 0 ? "item active" : "item"
+          }" data.element="${element.generated_text}">${
+            element.generated_text
+          }</li>`;
+        });
+
+        autocompleteList.innerHTML = options;
+
+        if (isSupported) {
+          const selection = window.getSelection();
+          if (selection.rangeCount !== 0) {
+            var range = selection.getRangeAt(0);
+            var rect = range.getClientRects()[0];
+            if (rect) {
+              x = rect.left;
+              y = rect.top + 5;
+              autocomplete.setAttribute("style", `top:${y}px; left:${x}px`);
+              autocomplete.classList.add("active");
+
+              document.addEventListener("keydown", handleSelection);
+              document.addEventListener("click", handleClick);
+            }
+          }
+        }
+      }
+
+      function handleClick(event) {
+        event.preventDefault();
+        focusElement();
+      }
+
+      function handleSelection(event) {
+        event.preventDefault();
+        const autocomplete = document.querySelector(".autocomplete");
+        const actual = document.querySelector(
+          ".autocomplete-list .item.active"
+        );
+        const nodes = document.querySelectorAll(".autocomplete-list .item");
+        if (event.keyCode === 38) {
+          const prev = actual.previousSibling;
+          actual.classList.remove("active");
+          if (prev) {
+            prev.classList.add("active");
+          } else {
+            nodes[nodes.length - 1].classList.add("active");
+          }
+        } else if (event.keyCode === 40) {
+          const next = actual.nextSibling;
+          actual.classList.remove("active");
+          if (next) {
+            next.classList.add("active");
+          } else {
+            nodes[0].classList.add("active");
+          }
+        } else if (event.keyCode === 13) {
+          const content = `${document
+            .querySelector(".autocomplete .item.active")
+            .getAttribute("data.element")}`;
+          elementTriggered.innerText = content;
+          focusElement();
+        } else {
+          focusElement();
+        }
+      }
+
+      function focusElement() {
+        const autocomplete = document.querySelector(".autocomplete");
+        autocomplete.classList.remove("active");
+        document.removeEventListener("keydown", handleSelection);
+        document.removeEventListener("click", handleClick);
+        elementTriggered.focus();
+        var range = document.createRange();
+        range.selectNodeContents(elementTriggered);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    </script>
+  </body>
+</html>
