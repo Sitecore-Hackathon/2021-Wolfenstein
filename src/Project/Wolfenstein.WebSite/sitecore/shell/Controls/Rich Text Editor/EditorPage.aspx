@@ -140,79 +140,6 @@
   </script>
 
    <script type="text/javascript" src="/sitecore/shell/Controls/Rich Text Editor/axios.min.js"></script>
-   <style>
-      .autocomplete {
-        position: absolute;
-        display: none;
-      }
-
-      .autocomplete-title {
-        display: block;
-        padding: 5px 10px;
-        font-size: 16px;
-        font-weight: 900;
-        border: solid 1px #000;
-        background-color: #e3e3e3;
-      }
-
-      .autocomplete.active {
-        display: block;
-        background-color: #fff;
-        border: solid 1px #000;
-      }
-
-      .autocomplete-list {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .autocomplete .item {
-        padding: 3px 5px;
-      }
-
-      .autocomplete .item.active {
-        background-color: #4d93f8;
-        font-weight: 900;
-      }
-
-      .loader {
-        width: 15px;
-        height: 15px;
-        display: none;
-        padding: 0px;
-        position: absolute;
-        border-radius: 100%;
-        border: 2px solid;
-        border-top-color: #4d93f8;
-        border-bottom-color: rgba(255, 255, 255, 0.3);
-        border-left-color: #4d93f8;
-        border-right-color: rgba(255, 255, 255, 0.3);
-        -webkit-animation: loader4 1s ease-in-out infinite;
-        animation: loader4 1s ease-in-out infinite;
-      }
-
-      @keyframes loader4 {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      @-webkit-keyframes loader4 {
-        from {
-          -webkit-transform: rotate(0deg);
-        }
-        to {
-          -webkit-transform: rotate(360deg);
-        }
-      }
-
-      .loader.active {
-        display: block;
-      }
-    </style>
 </head>
 
 <body class="scStretch">
@@ -260,8 +187,7 @@
                 OnClientSelectionChange="OnClientSelectionChange"
                 OnClientInit="OnClientInit"
                 OnClientModeChange="OnClientModeChange"
-                OnClientPasteHtml="OnClientPasteHtml" />
-
+                OnClientPasteHtml="OnClientPasteHtml" />              
             </ContentTemplate>
           </asp:UpdatePanel>
         </div>

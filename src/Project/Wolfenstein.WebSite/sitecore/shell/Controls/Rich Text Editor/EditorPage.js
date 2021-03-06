@@ -1,7 +1,7 @@
 if (typeof (Sitecore) == "undefined") Sitecore = new Object();
 if (typeof (Sitecore.Controls) == "undefined") Sitecore.Controls = new Object();
 
-Sitecore.Controls.RichEditor = Class.create({  
+Sitecore.Controls.RichEditor = Class.create({
     initialize: function (editorId) {
         this.editorId = editorId;
         this.elementTriggered = null;
@@ -13,13 +13,6 @@ Sitecore.Controls.RichEditor = Class.create({
         if (!scForm.browser.isIE) {
             this.getEditor().get_element().style.minHeight = '';
         }
-
-        this.setText('<div class="autocomplete">' +
-            '<span class="autocomplete-title">Predictive Search</span>' +
-            '<ul class="autocomplete-list"></ul>' +
-            '</div>' +
-            '<div class="loader"></div>');
-        console.log("Loaded basic data");
 
         fixIeObjectTagBug();
 
@@ -41,6 +34,12 @@ Sitecore.Controls.RichEditor = Class.create({
         }
 
         this.oldValue = editor.get_html(true);
+        this.setText(this.oldValue + '<div class="autocomplete">' +
+            '<span class="autocomplete-title">Predictive Search</span>' +
+            '<ul class="autocomplete-list"></ul>' +
+            '</div>' +
+            '<div class="loader"></div>');
+        console.log("Loaded basic data");
     },
 
     getEditor: function () {
@@ -117,17 +116,17 @@ Sitecore.Controls.RichEditor = Class.create({
                     var rect = range.getClientRects()[0];
                     if (rect) {
                         x = rect.left;
-                        y = rect.top + 5;                       
+                        y = rect.top + 5;
                         loader.setAttribute("style", `top:${y}px; left:${x}px`);
                         loader.classList.add("active");
                     }
                 }
             }
-            this.getPredictiveSearch(event.currentTarget, loader);
+            this.getPredictiveSearch(event.currentTarget, loader, this, editor);
         }
     },
 
-    getPredictiveSearch: function (element, loader) {
+    getPredictiveSearch: function (element, loader, container, editor) {
         var data = {};
         data.text = element.body.innerText.trim();
         data.length = 1;
@@ -142,7 +141,7 @@ Sitecore.Controls.RichEditor = Class.create({
             .then(function (res) {
                 if (res.data.generatedTexts.length) {
                     loader.classList.remove("active");
-                    renderResponse(res.data.generatedTexts);
+                    container.renderResponse(res.data.generatedTexts, container, editor);
                 }
             })
             .catch(function (error) {
@@ -151,13 +150,13 @@ Sitecore.Controls.RichEditor = Class.create({
             });
     },
 
-    renderResponse: function (data) {
+    renderResponse: function (data, container, editor) {
         var range = document.createRange(),
             x = null,
             y = null;
 
-        const autocomplete = document.querySelector(".autocomplete");
-        const autocompleteList = document.querySelector(".autocomplete-list");
+        const autocomplete = editor.get_document().querySelector(".autocomplete");
+        const autocompleteList = editor.get_document().querySelector(".autocomplete-list");
         const isSupported = typeof window.getSelection !== "undefined";
         var options = "";
 
