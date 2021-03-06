@@ -1,0 +1,8 @@
+flask
+waitress
+Flask-Selfdoc
+flask_cors
+requests
+dnspython
+tensorflow
+transformers
