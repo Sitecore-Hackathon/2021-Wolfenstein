@@ -128,11 +128,11 @@ Sitecore.Controls.RichEditor = Class.create({
     },
 
     getPredictiveSearch: function (element, loader) {
-        var data = new FormData();
-        data.append("text", element.body.innerText.trim());
-        data.append("length", 1);
-        data.append("sequences", 5);
-        const url = "http://8ee8a6d2bcc6.ngrok.io/api/generate-text";
+        var data = {};
+        data.text = element.body.innerText.trim();
+        data.length = 1;
+        data.sequences = 5;
+        const url = "https://8ee8a6d2bcc6.ngrok.io/api/generate-text";
         this.elementTriggered = element;
 
         axios
