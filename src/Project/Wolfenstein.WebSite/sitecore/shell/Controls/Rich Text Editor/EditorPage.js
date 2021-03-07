@@ -5,6 +5,7 @@ Sitecore.Controls.RichEditor = Class.create({
     initialize: function (editorId) {
         this.editorId = editorId;
         this.elementTriggered = null;
+        this.previousContent = null;
     },
 
     onClientLoad: function (editor) {
@@ -93,6 +94,11 @@ Sitecore.Controls.RichEditor = Class.create({
         if (!scForm.isFunctionKey(evt, true)) {
             scForm.setModified(true);
         }
+
+        const autocomplete = editor.get_document().querySelector(".autocomplete");
+        if (autocomplete.classList.contains("active")) {
+            this.handleSelection(evt);
+        }
     },
 
     handleKeyPress: function (event) {
@@ -105,14 +111,10 @@ Sitecore.Controls.RichEditor = Class.create({
 
         if (event.keyCode == 32 && event.shiftKey) {
             console.log("event handled");
-            var range = document.createRange(),
-                x = null,
-                y = null;
-            const isSupported = typeof window.getSelection !== "undefined";
+            const isSupported = typeof editor.getSelection() !== "undefined";
             if (isSupported) {
-                const selection = window.getSelection();
-                if (selection.rangeCount !== 0) {
-                    var range = selection.getRangeAt(0);
+                const range = editor.getSelection().getRange();
+                if (range.endOffset !== 0) {
                     var rect = range.getClientRects()[0];
                     if (rect) {
                         x = rect.left;
@@ -133,6 +135,7 @@ Sitecore.Controls.RichEditor = Class.create({
         data.sequences = 5;
         const url = "https://8ee8a6d2bcc6.ngrok.io/api/generate-text";
         this.elementTriggered = element;
+        this.previousContent = data.text;
 
         axios
             .post(url, data, {
@@ -150,14 +153,10 @@ Sitecore.Controls.RichEditor = Class.create({
             });
     },
 
-    renderResponse: function (data, container, editor) {
-        var range = document.createRange(),
-            x = null,
-            y = null;
-
+    renderResponse: function (data, container, editor) {     
         const autocomplete = editor.get_document().querySelector(".autocomplete");
         const autocompleteList = editor.get_document().querySelector(".autocomplete-list");
-        const isSupported = typeof window.getSelection !== "undefined";
+        const isSupported = typeof editor.getSelection() !== "undefined";
         var options = "";
 
         data.forEach((element, index) => {
@@ -169,9 +168,8 @@ Sitecore.Controls.RichEditor = Class.create({
         autocompleteList.innerHTML = options;
 
         if (isSupported) {
-            const selection = window.getSelection();
-            if (selection.rangeCount !== 0) {
-                var range = selection.getRangeAt(0);
+            const range = editor.getSelection().getRange();
+            if (range.endOffset !== 0) {
                 var rect = range.getClientRects()[0];
                 if (rect) {
                     x = rect.left;
@@ -179,8 +177,8 @@ Sitecore.Controls.RichEditor = Class.create({
                     autocomplete.setAttribute("style", `top:${y}px; left:${x}px`);
                     autocomplete.classList.add("active");
 
-                    document.addEventListener("keydown", handleSelection);
-                    document.addEventListener("click", handleClick);
+                    autocomplete.addEventListener("keydown", this.handleSelection);
+                    autocomplete.addEventListener("click", this.handleClick);
                 }
             }
         }
@@ -188,16 +186,16 @@ Sitecore.Controls.RichEditor = Class.create({
 
     handleClick: function (event) {
         event.preventDefault();
-        focusElement();
+        event.currentTarget.focus();
     },
 
     handleSelection: function (event) {
         event.preventDefault();
-        const autocomplete = document.querySelector(".autocomplete");
-        const actual = document.querySelector(
+        var editor = this.getEditor();
+        const actual = editor.get_document().querySelector(
             ".autocomplete-list .item.active"
         );
-        const nodes = document.querySelectorAll(".autocomplete-list .item");
+        const nodes = editor.get_document().querySelectorAll(".autocomplete-list .item");
         if (event.keyCode === 38) {
             const prev = actual.previousSibling;
             actual.classList.remove("active");
@@ -214,23 +212,24 @@ Sitecore.Controls.RichEditor = Class.create({
             } else {
                 nodes[0].classList.add("active");
             }
-        } else if (event.keyCode === 13) {
-            const content = `${document
+        } else if (event.keyCode === 17) {
+            const content = `${editor.get_document()
                 .querySelector(".autocomplete .item.active")
                 .getAttribute("data.element")}`;
-            elementTriggered.innerText = content;
-            focusElement();
+            this.elementTriggered.body.innerHTML = this.elementTriggered.body.innerHTML.replace(this.previousContent, content);
+            this.focusElement();
         } else {
-            focusElement();
+            this.focusElement();
         }
     },
 
-    focusElement: function () {
-        const autocomplete = document.querySelector(".autocomplete");
+    focusElement: function () {        
+        var editor = this.getEditor();
+        const autocomplete = editor.get_document().querySelector(".autocomplete");
         autocomplete.classList.remove("active");
-        document.removeEventListener("keydown", handleSelection);
-        document.removeEventListener("click", handleClick);
-        elementTriggered.focus();
+        autocomplete.removeEventListener("keydown", handleSelection);
+        autocomplete.removeEventListener("click", handleClick);
+        //this.elementTriggered.focus();
         var range = document.createRange();
         range.selectNodeContents(elementTriggered);
         range.collapse(false);
