@@ -22,27 +22,9 @@ https://youtu.be/X7pkM_mK0Lo
 None
 
 ## Installation instructions
-⟹ Write a short clear step-wise instruction on how to install your module.  
-
-> _A simple well-described installation process is required to win the Hackathon._  
-> Feel free to use any of the following tools/formats as part of the installation:
-> - Sitecore Package files
-> - Docker image builds
-> - Sitecore CLI
-> - msbuild
-> - npm / yarn
-> 
-> _Do not use_
-> - TDS
-> - Unicorn
- 
-f. ex. 
-
 1. Start docker environment using `.\Start-Hackathon.ps1`
 2. Open solution in Visual Studio and run build
-3. Use the Sitecore Installation wizard to install the [package](#link-to-package)
-4. ...
-5. profit
+3. Go to any RTF editor
 
 ### Configuration
 None
