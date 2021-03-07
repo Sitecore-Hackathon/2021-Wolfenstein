@@ -33,16 +33,6 @@ None
 
 Go to https://github.com/Sitecore-Hackathon/2021-Wolfenstein/blob/main/docs/images/User%20Guide%202021.md
 
-![Hackathon Logo](docs/images/hackathon.png?raw=true "Hackathon Logo")
-
-You can embed images of different formats too:
-
-![Deal With It](docs/images/deal-with-it.gif?raw=true "Deal With It")
-
-And you can embed external images too:
-
-![Random](https://thiscatdoesnotexist.com/)
-
 ## Comments
 None
 
