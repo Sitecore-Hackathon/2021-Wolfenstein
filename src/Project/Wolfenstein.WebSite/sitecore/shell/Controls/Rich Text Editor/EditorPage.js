@@ -229,7 +229,6 @@ Sitecore.Controls.RichEditor = Class.create({
         autocomplete.classList.remove("active");
         autocomplete.removeEventListener("keydown", handleSelection);
         autocomplete.removeEventListener("click", handleClick);
-        //this.elementTriggered.focus();
         var range = document.createRange();
         range.selectNodeContents(elementTriggered);
         range.collapse(false);
