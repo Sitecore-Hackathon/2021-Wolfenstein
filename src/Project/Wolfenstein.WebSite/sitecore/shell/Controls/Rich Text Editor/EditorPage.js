@@ -57,6 +57,12 @@ Sitecore.Controls.RichEditor = Class.create({
             w = scForm.browser.getParentWindow(w.frameElement.ownerDocument);
         }
 
+        var editor = this.getEditor();
+        const autocomplete = editor.get_document().querySelector(".autocomplete");
+        const loader = editor.get_document().querySelector(".loader");
+
+        html.replace(autocomplete.innerHTML, '');
+        html.replace(loader.innerHTML, '');
         w.scContent.saveRichText(html);
     },
 
@@ -227,14 +233,11 @@ Sitecore.Controls.RichEditor = Class.create({
         var editor = this.getEditor();
         const autocomplete = editor.get_document().querySelector(".autocomplete");
         autocomplete.classList.remove("active");
-        autocomplete.removeEventListener("keydown", handleSelection);
-        autocomplete.removeEventListener("click", handleClick);
+        autocomplete.removeEventListener("keydown", this.handleSelection);
+        autocomplete.removeEventListener("click", this.handleClick);
         var range = document.createRange();
-        range.selectNodeContents(elementTriggered);
+        range.selectNodeContents(this.elementTriggered.body);
         range.collapse(false);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
     }
 });
 
