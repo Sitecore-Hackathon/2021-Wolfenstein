@@ -30,9 +30,8 @@ None
 None
 
 ## Usage instructions
-⟹ Provide documentation about your module, how do the users use your module, where are things located, what do the icons mean, are there any secret shortcuts etc.
 
-Include screenshots where necessary. You can add images to the `./images` folder and then link to them from your documentation:
+Go to https://github.com/Sitecore-Hackathon/2021-Wolfenstein/blob/main/docs/images/User%20Guide%202021.md
 
 ![Hackathon Logo](docs/images/hackathon.png?raw=true "Hackathon Logo")
 
